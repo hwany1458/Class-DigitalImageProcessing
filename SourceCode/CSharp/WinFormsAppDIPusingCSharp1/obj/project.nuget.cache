@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "p1O0ukQbXANei8oImMvNdzN1CVIvxm9tlnuCmXaXtXEnVrXXJdQ7goQWDrchRhJkx7woc/y7m1CL7MakZh+a/g==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\이용환\\Dropbox\\PC\\Downloads\\ClassProjects\\WinFormsAppDIPusingCSharp1\\WinFormsAppDIPusingCSharp1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\이용환\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.16\\microsoft.netcore.app.host.win-x64.5.0.16.nupkg.sha512"
+  ],
+  "logs": []
+}
