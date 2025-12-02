@@ -212,8 +212,6 @@ namespace WindowsFormsAppDIPOpenCVSharp
             }
         }
 
-                
-                
         private void 블러링ToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             if (inputImage != null)
@@ -223,7 +221,6 @@ namespace WindowsFormsAppDIPOpenCVSharp
 
                 PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
                 PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
-
             }
             else
             {
@@ -382,10 +379,10 @@ namespace WindowsFormsAppDIPOpenCVSharp
                     float alpha = 1.0f;
                     Mat dst = (1 + alpha) * inputImage - alpha * blurred;
 
-                    String text = string.Format("sigma:{0}", sigma);
-                    Cv2.PutText(dst, text, new OpenCvSharp.Point(10, 30), HersheyFonts.HersheyTriplex, 1.0, new OpenCvSharp.Scalar(255));
+                    //String text = string.Format("sigma:{0}", sigma);
+                    //Cv2.PutText(dst, text, new OpenCvSharp.Point(10, 30), HersheyFonts.HersheyTriplex, 1.0, new OpenCvSharp.Scalar(255));
 
-                    Cv2.ImShow("dst"+sigma, dst);
+                    Cv2.ImShow("sigma:" + sigma, dst);
                 }
                 Cv2.WaitKey(0);
 
@@ -456,6 +453,402 @@ namespace WindowsFormsAppDIPOpenCVSharp
             }
         }
 
+        private void 칼라분할ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // 분리될 채널만큼의 1차원 배열 Mat
+            // 3 채널 이미지의 경우, 아래와 같이 ..
+            Mat[] splittedImage = new Mat[3];
+            Mat mergedImage = new Mat();
+
+            if (inputImage != null)
+            {
+                if (inputImage.Channels() == 1)
+                {
+                    MessageBox.Show("Count of image channel is 1");
+                }
+                else
+                {
+                    // 채널별 분리 (imread에서는 BGR 순으로)
+                    Cv2.Split(inputImage, out splittedImage);
+                    Cv2.ImShow("Channel B", splittedImage[0]);
+                    Cv2.ImShow("Channel G", splittedImage[1]);
+                    Cv2.ImShow("Channel R", splittedImage[2]);
+
+                    int width = inputImage.Rows;
+                    int height = inputImage.Cols;
+                    splittedImage[2] = Mat.Zeros(width, height, MatType.CV_8UC1);
+                    Cv2.Merge(splittedImage, mergedImage);
+
+                    PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mergedImage);
+                    PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
+                    Cv2.WaitKey(0);
+                    Cv2.DestroyAllWindows();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void bGR2GaryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                //--- 여기에
+                Cv2.CvtColor(inputImage, outputImage, ColorConversionCodes.BGR2GRAY);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void bGRToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // 분리될 채널만큼의 1차원 배열 Mat
+            Mat[] splittedImage = new Mat[3];
+
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                //--- 여기에
+                Cv2.CvtColor(inputImage, outputImage, ColorConversionCodes.BGR2YCrCb);
+
+                Cv2.Split(outputImage, out splittedImage);
+                Cv2.ImShow("Channel Y", splittedImage[0]);
+                Cv2.ImShow("Channel Cr", splittedImage[1]);
+                Cv2.ImShow("Channel Cb", splittedImage[2]);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void bGR2RGBToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                //--- 여기에
+                Cv2.CvtColor(inputImage, outputImage, ColorConversionCodes.BGR2RGB);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 퓨리에변환ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                int width = inputImage.Width;
+                int height = inputImage.Height;
+
+                Mat src = new Mat();
+                if (inputImage.Channels() == 3)
+                {
+                    Cv2.CvtColor(inputImage, src, ColorConversionCodes.BGR2GRAY);
+                }
+                else
+                {
+                    src = inputImage;
+                }
+
+                // 이미지 크기 확장 (최적화된 DFT 크기 사용)
+                Mat padded = new Mat();
+                int m = Cv2.GetOptimalDFTSize(src.Rows);
+                int n = Cv2.GetOptimalDFTSize(src.Cols);
+                Cv2.CopyMakeBorder(src, padded, 0, m - src.Rows, 0, n - src.Cols, BorderTypes.Constant, Scalar.All(0));
+
+                // 실수부와 허수부 채널 생성
+                Mat realPart = new Mat();
+                Mat imaginaryPart = Mat.Zeros(padded.Size(), MatType.CV_32F); // 허수부 (0으로 초기화)
+
+                // 실수부 변환 (CV_32F 형식으로)
+                padded.ConvertTo(realPart, MatType.CV_32F);
+
+                // 실수부와 허수부의 채널 확인
+                Console.WriteLine($"realPart Channels: {realPart.Channels()}"); // 1이어야 함
+                Console.WriteLine($"imaginaryPart Channels: {imaginaryPart.Channels()}"); // 1이어야 함
+
+                // 복합 이미지 생성 (2채널로 병합)
+                Mat complexImage = new Mat();
+                Cv2.Merge(new[] { realPart, imaginaryPart }, complexImage);
+
+                // complexImage의 타입 확인
+                Console.WriteLine($"complexImage Type: {complexImage.Type()}"); // 예상: CV_32FC2
+                Console.WriteLine($"complexImage Channels: {complexImage.Channels()}"); // 예상: 2
+
+                // Discrete Fourier Transform 수행
+                Cv2.Dft(complexImage, complexImage, DftFlags.ComplexOutput);
+
+                // DFT 결과를 분리
+                Mat[] planes = Cv2.Split(complexImage);
+
+                // Magnitude 계산
+                Mat magnitude = new Mat();
+                Cv2.Magnitude(planes[0], planes[1], magnitude);
+
+                // 로그 스케일 변환
+                Cv2.Add(magnitude, Scalar.All(1), magnitude); // log(1 + magnitude)
+                Cv2.Log(magnitude, magnitude);
+
+                // FFT Shift 적용 (저주파 성분을 중앙으로 이동)
+                magnitude = FFTShift(magnitude);
+
+                // 결과 이미지 정규화 (0~1 사이 값으로 변환)
+                Mat magImage = new Mat();
+                Cv2.Normalize(magnitude, magImage, 0, 1, NormTypes.MinMax);
+
+                // 결과 출력
+                Cv2.ImShow("Magnitude Spectrum", magImage);
+
+                // 키 입력 대기 후 종료
+                Cv2.WaitKey(0);
+                Cv2.DestroyAllWindows();
+
+                //PB_ResultImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(magImage);
+                //PB_ResultImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        // FFT Shift 함수
+        static Mat FFTShift(Mat mag)
+        {
+            // FFT Shift를 위해 이미지 크기를 절반으로 나눔
+            int cx = mag.Cols / 2;
+            int cy = mag.Rows / 2;
+
+            // 4개 영역으로 분리
+            Rect q0 = new Rect(0, 0, cx, cy);              // Top-Left
+            Rect q1 = new Rect(cx, 0, cx, cy);            // Top-Right
+            Rect q2 = new Rect(0, cy, cx, cy);            // Bottom-Left
+            Rect q3 = new Rect(cx, cy, cx, cy);           // Bottom-Right
+
+            Mat topLeft = new Mat(mag, q0);
+            Mat topRight = new Mat(mag, q1);
+            Mat bottomLeft = new Mat(mag, q2);
+            Mat bottomRight = new Mat(mag, q3);
+
+            // 사분면 교환 (Top-Left <-> Bottom-Right, Top-Right <-> Bottom-Left)
+            Mat temp = new Mat();
+            topLeft.CopyTo(temp);
+            bottomRight.CopyTo(topLeft);
+            temp.CopyTo(bottomRight);
+
+            topRight.CopyTo(temp);
+            bottomLeft.CopyTo(topRight);
+            temp.CopyTo(bottomLeft);
+
+            return mag;
+        }
+
+        private void 퓨리에변환함수ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                // 주파수변환
+                Mat complexDFT = FrequencyTransform.ComputeDFT(inputImage);
+
+                // 스펙트럼 시각화
+                Mat spectrum = FrequencyTransform.GetMagnitudeSpectrum(complexDFT);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(spectrum);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 퓨리에역변환ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                //outputImage = new Mat();
+
+                // 1. DFT 수행
+                Mat complexDFT = FrequencyTransform.ComputeDFT(inputImage);
+
+                // 2. 스펙트럼 시각화
+                Mat spectrum = FrequencyTransform.GetMagnitudeSpectrum(complexDFT);
+
+                // 3. IDFT 수행 (원본 복원)
+                Mat reconstructed = FrequencyTransform.ComputeIDFT(complexDFT, inputImage.Size());
+
+                // 4. 결과 표시
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(reconstructed);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 변환후가우시안블러닝ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                //-- 여기에
+
+                Mat gray = new Mat();
+                Cv2.CvtColor(inputImage, gray, ColorConversionCodes.BGR2GRAY);
+
+                // 1) DFT
+                Mat floatImg = new Mat();
+                gray.ConvertTo(floatImg, MatType.CV_32F);
+
+                Mat[] planes = { floatImg, Mat.Zeros(gray.Size(), MatType.CV_32F) };
+                Mat complex = new Mat();
+                Cv2.Merge(planes, complex);
+                Cv2.Dft(complex, complex);
+
+                // 2) Shift (DFT 중심을 중앙으로 이동)
+                Mat shifted = FourierGaussianBlur.ShiftDFT(complex);
+
+                // 3) Gaussian LPF 생성
+                Mat filter = FourierGaussianBlur.CreateGaussianFilter(gray.Size(), sigma: 40);
+
+                // 4) 필터 적용 (element-wise multiplication)
+                Mat filtered = new Mat();
+                Cv2.MulSpectrums(shifted, filter, filtered, 0);
+
+                // 5) 다시 Unshift (원래 위치로 되돌림)
+                Mat unshifted = FourierGaussianBlur.ShiftDFT(filtered);
+
+                // 6) IDFT
+                Mat idft = new Mat();
+                Cv2.Dft(unshifted, idft, DftFlags.Inverse | DftFlags.RealOutput | DftFlags.Scale);
+
+                // 7) 정규화 후 출력
+                Cv2.Normalize(idft, idft, 0, 255, NormTypes.MinMax);
+                idft.ConvertTo(idft, MatType.CV_8U);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(idft);
+
+                // 4. 결과 표시
+                //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 변환후가우시안블러링채널별ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                //-- 여기에
+
+                Mat[] bgr = Cv2.Split(inputImage);    // R,G,B 분리
+                Mat[] resultChannels = new Mat[3];
+
+                // Gaussian Low-pass Filter (1개만 만들어서 모든 채널에 사용)
+                //Mat filter = CreateGaussianFilter(inputImage.Size(), sigma: 40);
+                Mat filter = FourierGaussianBlur.CreateGaussianFilter(inputImage.Size(), sigma: 40);
+
+                for (int c = 0; c < 3; c++)
+                {
+                    Mat channel = bgr[c];
+
+                    // 1) float 변환
+                    Mat floatImg = new Mat();
+                    channel.ConvertTo(floatImg, MatType.CV_32F);
+
+                    // 2) DFT 변환
+                    Mat[] planes = { floatImg, Mat.Zeros(channel.Size(), MatType.CV_32F) };
+                    Mat complex = new Mat();
+                    Cv2.Merge(planes, complex);
+                    Cv2.Dft(complex, complex);
+
+                    // 3) Shift
+                    //Mat shifted = ShiftDFT(complex);
+                    Mat shifted = FourierGaussianBlur.ShiftDFT(complex);
+
+                    // 4) Spectral Filtering
+                    Mat filtered = new Mat();
+                    Cv2.MulSpectrums(shifted, filter, filtered, 0);
+
+                    // 5) Unshift
+                    //Mat unshifted = ShiftDFT(filtered);
+                    Mat unshifted = FourierGaussianBlur.ShiftDFT(filtered);
+
+                    // 6) IDFT
+                    Mat idft = new Mat();
+                    Cv2.Dft(unshifted, idft, DftFlags.Inverse | DftFlags.RealOutput | DftFlags.Scale);
+
+                    // 7) 0~255로 정규화
+                    Cv2.Normalize(idft, idft, 0, 255, NormTypes.MinMax);
+                    idft.ConvertTo(idft, MatType.CV_8U);
+
+                    // 8) 결과 채널 저장
+                    resultChannels[c] = idft;
+                }
+
+                // 9) 필터링된 3개 채널 합치기
+                Mat colorOutput = new Mat();
+                Cv2.Merge(resultChannels, colorOutput);
+
+                // 10) 출력
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(colorOutput);
+
+                // 4. 결과 표시
+                //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 변환후가우시안블러링칼라ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                //-- 여기에
+
+                int kernelSize = 31;  // GaussianBlur(Size(31,31))와 동일한 정도
+                //Mat result = FourierGaussianBlur.ApplyGaussianFourierColor(inputImage, kernelSize);
+                Mat blurred = FourierGaussianBlur.GaussianBlurFFT(inputImage, kernelSize);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(blurred);
+                //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
 
         // ------
         private void GetImageHistogram(Mat inputImage)
