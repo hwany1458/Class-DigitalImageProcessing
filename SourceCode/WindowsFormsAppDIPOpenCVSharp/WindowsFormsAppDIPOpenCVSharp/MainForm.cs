@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -843,6 +844,167 @@ namespace WindowsFormsAppDIPOpenCVSharp
                 PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(blurred);
                 //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
                 PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 노이즈생성ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                Mat noisedImage = new Mat(inputImage.Size(), MatType.CV_8UC3);
+
+                Cv2.Randn(noisedImage, Scalar.All(0), Scalar.All(50));
+                Cv2.ImShow("Filter", noisedImage);
+                Cv2.AddWeighted(inputImage, 1, noisedImage, 1, 0, noisedImage);
+                Cv2.ImShow("Noise", noisedImage);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(noisedImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 노이즈추가제거ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                Mat noisedImage = new Mat(inputImage.Size(), MatType.CV_8UC3);
+                Mat denoisedImage = new Mat(inputImage.Size(), MatType.CV_8UC3);
+
+                Cv2.Randn(noisedImage, Scalar.All(0), Scalar.All(50));
+                Cv2.AddWeighted(inputImage, 1, noisedImage, 1, 0, noisedImage);
+                Cv2.ImShow("Noise", noisedImage);
+
+                Cv2.FastNlMeansDenoisingColored(noisedImage, denoisedImage, 15, 15, 5, 10);
+                //Cv2.FastNlMeansDenoising(noisedImage, denoisedImage, 3, 7, 21);
+                Cv2.ImShow("Denoise", denoisedImage);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(denoisedImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 노이즈제거효과ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                Mat noisedImage = new Mat(inputImage.Size(), MatType.CV_8UC3);
+                Cv2.Randn(noisedImage, Scalar.All(0), Scalar.All(50));
+                Cv2.AddWeighted(inputImage, 1, noisedImage, 1, 0, noisedImage);
+                Cv2.ImShow("Noise", noisedImage);
+
+                Mat removedNoiseMedianBlur = new Mat();
+                Mat removedNoiseGaussianBlur = new Mat();
+                Mat removedNoiseBilateralFilter = new Mat();
+                Mat denoising = new Mat();
+
+                Cv2.MedianBlur(noisedImage, removedNoiseMedianBlur, 3);
+                Cv2.GaussianBlur(noisedImage, removedNoiseGaussianBlur, new OpenCvSharp.Size(5, 5), 3, 3);
+                Cv2.BilateralFilter(noisedImage, removedNoiseBilateralFilter, 5, 250, 10);
+                Cv2.FastNlMeansDenoisingColored(noisedImage, denoising, 15, 15, 5, 10);
+
+                Cv2.ImShow("MedianBlur", removedNoiseMedianBlur);
+                Cv2.ImShow("GaussianBlur", removedNoiseGaussianBlur);
+                Cv2.ImShow("BilateralFilter", removedNoiseBilateralFilter);
+                Cv2.ImShow("Denoising", denoising);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(removedNoiseGaussianBlur);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 칼라히스토그램평활화ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+
+                //--- 여기에
+                outputImage = HistogramEqualizationColor(inputImage);
+
+                // 4. 결과 표시
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        public Mat HistogramEqualizationColor(Mat input)
+        {
+            // ① BGR → YCrCb 변환
+            Mat ycrcb = new Mat();
+            Cv2.CvtColor(input, ycrcb, ColorConversionCodes.BGR2YCrCb);
+
+            // ② 채널 분리 (Y, Cr, Cb)
+            Mat[] channels = Cv2.Split(ycrcb);
+
+            // ③ Y 채널에만 히스토그램 평활화 수행
+            Mat yEqualized = new Mat();
+            Cv2.EqualizeHist(channels[0], yEqualized);
+
+            // ④ 다시 채널 병합 (Y = equalized, Cr, Cb 유지)
+            channels[0] = yEqualized;
+            Mat merged = new Mat();
+            Cv2.Merge(channels, merged);
+
+            // ⑤ YCrCb → BGR 복원
+            Mat result = new Mat();
+            Cv2.CvtColor(merged, result, ColorConversionCodes.YCrCb2BGR);
+
+            return result;
+        }
+
+        private void 칼라히스토그램평활화ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                //----------
+                // 입력 영상이 컬러인지 확인
+                if (inputImage.Channels() == 3)
+                {
+                    // ① B, G, R 채널 분리
+                    Mat[] channels = Cv2.Split(inputImage);   // channels[0]=B, [1]=G, [2]=R
+
+                    // ② 각 채널에 대해 Histogram Equalization 수행
+                    Mat eqBlue = new Mat();
+                    Mat eqGreen = new Mat();
+                    Mat eqRed = new Mat();
+
+                    Cv2.EqualizeHist(channels[0], eqBlue);
+                    Cv2.EqualizeHist(channels[1], eqGreen);
+                    Cv2.EqualizeHist(channels[2], eqRed);
+
+                    // ③ equalized 채널 3개를 다시 merge
+                    //Mat output = new Mat();
+                    Cv2.Merge(new Mat[] { eqBlue, eqGreen, eqRed }, outputImage);
+
+                    // 4. 결과 표시
+                    PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                    PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+                }
+                else
+                {
+                    MessageBox.Show("Input Image is NOT a color image ...");
+                }
             }
             else
             {
