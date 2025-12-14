@@ -154,7 +154,7 @@ namespace WindowsFormsAppDIPOpenCVSharp
                 0, gray.Cols - kernel2D.Cols,
                 BorderTypes.Constant, Scalar.All(0));
 
-            // 3) 커널을 중앙 기준으로 shift 
+            // ⭐ 3) 커널을 중앙 기준으로 shift (핵심!)
             kernelPadded = ShiftDFT(kernelPadded);
 
             // 4) FFT(kernel)

@@ -3,20 +3,24 @@
   "WorkspaceRootPath": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\windowsformsappdipopencvsharp\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|solutionrelative:windowsformsappdipopencvsharp\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|d:\\classprojects2025-2\\imageprocessing\\windowsformsappdipopencvsharp\\windowsformsappdipopencvsharp\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|solutionrelative:windowsformsappdipopencvsharp\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\windowsformsappdipopencvsharp\\fouriergaussianblur.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|solutionrelative:windowsformsappdipopencvsharp\\fouriergaussianblur.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|d:\\classprojects2025-2\\imageprocessing\\windowsformsappdipopencvsharp\\windowsformsappdipopencvsharp\\visionapplications.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|solutionrelative:windowsformsappdipopencvsharp\\visionapplications.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\windowsformsappdipopencvsharp\\frequencytransform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|solutionrelative:windowsformsappdipopencvsharp\\frequencytransform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|d:\\classprojects2025-2\\imageprocessing\\windowsformsappdipopencvsharp\\windowsformsappdipopencvsharp\\filters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|solutionrelative:windowsformsappdipopencvsharp\\filters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|d:\\classprojects2025-2\\imageprocessing\\windowsformsappdipopencvsharp\\windowsformsappdipopencvsharp\\cartoonizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|solutionrelative:windowsformsappdipopencvsharp\\cartoonizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\windowsformsappdipopencvsharp\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{10F1D6EF-D96F-461F-9AFB-4865A7A90B5D}|WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp.csproj|solutionrelative:windowsformsappdipopencvsharp\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,44 +34,59 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "FourierGaussianBlur.cs",
-              "DocumentMoniker": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\FourierGaussianBlur.cs",
-              "RelativeDocumentMoniker": "WindowsFormsAppDIPOpenCVSharp\\FourierGaussianBlur.cs",
-              "ToolTip": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\FourierGaussianBlur.cs",
-              "RelativeToolTip": "WindowsFormsAppDIPOpenCVSharp\\FourierGaussianBlur.cs",
-              "ViewState": "AgIAALUAAAAAAAAAAAAiwMkAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "VisionApplications.cs",
+              "DocumentMoniker": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\VisionApplications.cs",
+              "RelativeDocumentMoniker": "WindowsFormsAppDIPOpenCVSharp\\VisionApplications.cs",
+              "ToolTip": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\VisionApplications.cs",
+              "RelativeToolTip": "WindowsFormsAppDIPOpenCVSharp\\VisionApplications.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-02T23:28:04.722Z"
+              "WhenOpened": "2025-12-14T01:50:34.531Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "FrequencyTransform.cs",
-              "DocumentMoniker": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\FrequencyTransform.cs",
-              "RelativeDocumentMoniker": "WindowsFormsAppDIPOpenCVSharp\\FrequencyTransform.cs",
-              "ToolTip": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\FrequencyTransform.cs",
-              "RelativeToolTip": "WindowsFormsAppDIPOpenCVSharp\\FrequencyTransform.cs",
-              "ViewState": "AgIAAFsAAAAAAAAAAABAwGUAAAAAAAAAAAAAAA==",
+              "Title": "Cartoonizer.cs",
+              "DocumentMoniker": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\Cartoonizer.cs",
+              "RelativeDocumentMoniker": "WindowsFormsAppDIPOpenCVSharp\\Cartoonizer.cs",
+              "ToolTip": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\Cartoonizer.cs",
+              "RelativeToolTip": "WindowsFormsAppDIPOpenCVSharp\\Cartoonizer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-02T22:57:54.275Z"
+              "WhenOpened": "2025-12-14T01:40:36.892Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
+              "Title": "Filters.cs",
+              "DocumentMoniker": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\Filters.cs",
+              "RelativeDocumentMoniker": "WindowsFormsAppDIPOpenCVSharp\\Filters.cs",
+              "ToolTip": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\Filters.cs",
+              "RelativeToolTip": "WindowsFormsAppDIPOpenCVSharp\\Filters.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAF0AAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-14T01:28:36.752Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "MainForm.cs",
               "DocumentMoniker": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\MainForm.cs",
               "RelativeDocumentMoniker": "WindowsFormsAppDIPOpenCVSharp\\MainForm.cs",
               "ToolTip": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\MainForm.cs",
               "RelativeToolTip": "WindowsFormsAppDIPOpenCVSharp\\MainForm.cs",
-              "ViewState": "AgIAANIDAAAAAAAAAAAgwOQDAAAtAAAAAAAAAA==",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAswBQAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-02T19:19:26.924Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 4,
               "Title": "MainForm.cs [\uB514\uC790\uC778]",
               "DocumentMoniker": "D:\\ClassProjects2025-2\\ImageProcessing\\WindowsFormsAppDIPOpenCVSharp\\WindowsFormsAppDIPOpenCVSharp\\MainForm.cs",
               "RelativeDocumentMoniker": "WindowsFormsAppDIPOpenCVSharp\\MainForm.cs",

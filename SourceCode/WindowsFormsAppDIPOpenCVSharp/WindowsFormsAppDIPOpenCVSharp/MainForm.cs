@@ -18,7 +18,7 @@ namespace WindowsFormsAppDIPOpenCVSharp
     {
         // 변수 선언 (전역변수)
         Mat inputImage = null, outputImage = null;
-        string fileName;
+        //string fileName;
 
         public MainForm()
         {
@@ -1005,6 +1005,60 @@ namespace WindowsFormsAppDIPOpenCVSharp
                 {
                     MessageBox.Show("Input Image is NOT a color image ...");
                 }
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 세피아필터ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                outputImage = Filters.ApplySepiaFilter(inputImage);
+                //outputImage = Filters.ApplySepiaFilterEnhanced(inputImage);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("ERROR] Image is NOT ready ...");
+            }
+        }
+
+        private void 카툰화ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                //---------- 여기
+                outputImage = Cartoonizer.Cartoonify(inputImage);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
+                //Cv2.ImShow("Cartoon Image", outputImage);
+                //Cv2.WaitKey();
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 얼굴인식ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                //---------- 여기
+                outputImage = VisionApplications.FaceDetection(inputImage);
+
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
             }
             else
             {
