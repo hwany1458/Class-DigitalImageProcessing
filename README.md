@@ -1,5 +1,5 @@
 
-# Class-DigitalImageProcessing
+# [Class] Digital Image Processing
 
 원광대학교 게임콘텐츠학과 **게임과영상처리** 강의용 GitHub 저장소입니다.  
 본 저장소는 디지털 영상처리의 핵심 이론과 이를 실제 코드로 구현하는 실습 자료를 함께 다루기 위해 구성되었습니다.
@@ -222,27 +222,13 @@ Class-DigitalImageProcessing/
 
 권장 개발 환경은 다음과 같습니다.
 
-* **Language**
+* **Language** : C, C#
 
-  * C
-  * C#
+* **Library / Framework** : OpenCV, OpenCVSharp
 
-* **Library / Framework**
+* **IDE** : Visual Studio
 
-  * OpenCV
-  * OpenCVSharp
-
-* **IDE**
-
-  * Visual Studio
-  * 필요 시 C/C++ 빌드 환경
-
-* **학습자료**
-
-  * 강의 PPT
-  * 유인물
-  * 교재 예제 코드
-  * 샘플 이미지 및 동영상 파일  
+* **학습자료** : 강의 PPT, 유인물, 교재 예제 코드, 샘플 이미지 및 동영상 파일  
 
 ---
 
