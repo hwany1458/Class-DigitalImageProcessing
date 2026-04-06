@@ -182,7 +182,7 @@
 
 ---
 
-## 📁 예상 폴더 구조
+## 📁 폴더 구조
 
 저장소는 다음과 같은 형태로 구성하는 것을 권장합니다.
 
@@ -325,6 +325,6 @@ Class-DigitalImageProcessing/
 ## 📞 문의
 
 * 담당교수: 이용환
-* 이메일: `hwany1458@wku.ac.kr`
-* 강의자료 배포: Waffle  
+* 이메일: `hwany1458@empal.com`, `hwany1458@wku.ac.kr`
+
 
