@@ -223,11 +223,8 @@ Class-DigitalImageProcessing/
 권장 개발 환경은 다음과 같습니다.
 
 * **Language** : C, C#
-
 * **Library / Framework** : OpenCV, OpenCVSharp
-
 * **IDE** : Visual Studio
-
 * **학습자료** : 강의 PPT, 유인물, 교재 예제 코드, 샘플 이미지 및 동영상 파일  
 
 ---
