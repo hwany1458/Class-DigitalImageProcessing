@@ -6,6 +6,7 @@ using System.Data;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -625,8 +626,8 @@ namespace WindowsFormsAppDIPOpenCVSharp
                 Cv2.WaitKey(0);
                 Cv2.DestroyAllWindows();
 
-                //PB_ResultImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(magImage);
-                //PB_ResultImage.SizeMode = PictureBoxSizeMode.StretchImage;
+                //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(magImage);
+                //PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
             }
             else
             {
@@ -688,8 +689,6 @@ namespace WindowsFormsAppDIPOpenCVSharp
         {
             if (inputImage != null)
             {
-                //outputImage = new Mat();
-
                 // 1. DFT 수행
                 Mat complexDFT = FrequencyTransform.ComputeDFT(inputImage);
 
@@ -749,10 +748,9 @@ namespace WindowsFormsAppDIPOpenCVSharp
                 Cv2.Normalize(idft, idft, 0, 255, NormTypes.MinMax);
                 idft.ConvertTo(idft, MatType.CV_8U);
 
-                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(idft);
-
                 // 4. 결과 표시
                 //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(idft);
                 PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
             }
             else
@@ -818,10 +816,9 @@ namespace WindowsFormsAppDIPOpenCVSharp
                 Cv2.Merge(resultChannels, colorOutput);
 
                 // 10) 출력
-                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(colorOutput);
-
                 // 4. 결과 표시
                 //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(colorOutput);
                 PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
             }
             else
@@ -837,12 +834,12 @@ namespace WindowsFormsAppDIPOpenCVSharp
                 outputImage = new Mat();
                 //-- 여기에
 
-                int kernelSize = 31;  // GaussianBlur(Size(31,31))와 동일한 정도
-                //Mat result = FourierGaussianBlur.ApplyGaussianFourierColor(inputImage, kernelSize);
-                Mat blurred = FourierGaussianBlur.GaussianBlurFFT(inputImage, kernelSize);
+                //int kernelSize = 31;  // GaussianBlur(Size(31,31))와 동일한 정도
+                int kernelSize = 15;  
+                //Mat outputImage = FourierGaussianBlur.ApplyGaussianFourierColor(inputImage, kernelSize);
+                outputImage = FourierGaussianBlur.GaussianBlurFFT(inputImage, kernelSize);
 
-                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(blurred);
-                //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
                 PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
             }
             else
@@ -1215,7 +1212,582 @@ namespace WindowsFormsAppDIPOpenCVSharp
             }
         }
 
+        private void 퓨리에변환챗GPTToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
 
+                //--- 여기에
+
+                // 1. 이미지 경로 설정
+                //string imagePath = @"C:\Images\input.jpg";
+
+                // 2. 이미지 읽기
+                //Mat src = Cv2.ImRead(imagePath, ImreadModes.Color);
+
+                //if (src.Empty())
+                //{
+                //    Console.WriteLine("이미지를 불러올 수 없습니다.");
+                //    return;
+                //}
+
+                Mat src = inputImage;
+
+                // 3. 그레이스케일 변환
+                Mat gray = new Mat();
+                Cv2.CvtColor(src, gray, ColorConversionCodes.BGR2GRAY);
+
+                // 4. DFT 연산에 적합한 크기로 패딩
+                int optimalRows = Cv2.GetOptimalDFTSize(gray.Rows);
+                int optimalCols = Cv2.GetOptimalDFTSize(gray.Cols);
+
+                Mat padded = new Mat();
+                Cv2.CopyMakeBorder(
+                    gray,
+                    padded,
+                    0,
+                    optimalRows - gray.Rows,
+                    0,
+                    optimalCols - gray.Cols,
+                    BorderTypes.Constant,
+                    Scalar.All(0)
+                );
+
+                // 5. DFT 입력은 float 형식이어야 함
+                Mat floatImage = new Mat();
+                padded.ConvertTo(floatImage, MatType.CV_32FC1);
+
+                // 6. 실수부와 허수부 생성
+                Mat realPart = floatImage;
+                Mat imaginaryPart = new Mat(padded.Size(), MatType.CV_32FC1, Scalar.All(0));
+
+                Mat complexImage = new Mat();
+                Cv2.Merge(new Mat[] { realPart, imaginaryPart }, complexImage);
+
+                // 7. DFT 수행
+                Cv2.Dft(complexImage, complexImage);
+
+                // 8. 실수부와 허수부 분리
+                Cv2.Split(complexImage, out Mat[] planes);
+
+                Mat real = planes[0];
+                Mat imaginary = planes[1];
+
+                // 9. Magnitude 계산
+                Mat magnitude = new Mat();
+                Cv2.Magnitude(real, imaginary, magnitude);
+
+                // 10. 로그 스케일 변환
+                // magnitude = log(1 + magnitude)
+                Cv2.Add(magnitude, Scalar.All(1), magnitude);
+                Cv2.Log(magnitude, magnitude);
+
+                // 11. 짝수 크기로 자르기
+                magnitude = new Mat(
+                    magnitude,
+                    new Rect(
+                        0,
+                        0,
+                        magnitude.Cols & -2,
+                        magnitude.Rows & -2
+                    )
+                );
+
+                // 12. 저주파 성분을 중앙으로 이동
+                ShiftDFT(magnitude);
+
+                // 13. 화면 표시를 위해 0~255 범위로 정규화
+                Mat magnitudeDisplay = new Mat();
+                Cv2.Normalize(
+                    magnitude,
+                    magnitudeDisplay,
+                    0,
+                    255,
+                    NormTypes.MinMax
+                );
+
+                magnitudeDisplay.ConvertTo(magnitudeDisplay, MatType.CV_8UC1);
+
+                // 14. 결과 출력
+                Cv2.ImShow("Original Image", src);
+                Cv2.ImShow("Gray Image", gray);
+                Cv2.ImShow("Fourier Transform - Magnitude Spectrum", magnitudeDisplay);
+
+                Cv2.WaitKey(0);
+                Cv2.DestroyAllWindows();
+
+                // 15. 메모리 해제
+                //src.Dispose();
+                //gray.Dispose();
+                //padded.Dispose();
+                //floatImage.Dispose();
+                //imaginaryPart.Dispose();
+                //complexImage.Dispose();
+                //real.Dispose();
+                //imaginary.Dispose();
+                //magnitude.Dispose();
+                //magnitudeDisplay.Dispose();
+
+
+                //--- 여기까지
+                // 결과 표시
+                //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                //PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        //---------------
+
+        static void ShiftDFT(Mat image)
+        {
+            int cx = image.Cols / 2;
+            int cy = image.Rows / 2;
+
+            Mat q0 = new Mat(image, new Rect(0, 0, cx, cy));      // 좌상단
+            Mat q1 = new Mat(image, new Rect(cx, 0, cx, cy));     // 우상단
+            Mat q2 = new Mat(image, new Rect(0, cy, cx, cy));     // 좌하단
+            Mat q3 = new Mat(image, new Rect(cx, cy, cx, cy));    // 우하단
+
+            Mat temp = new Mat();
+
+            // 좌상단 <-> 우하단
+            q0.CopyTo(temp);
+            q3.CopyTo(q0);
+            temp.CopyTo(q3);
+
+            // 우상단 <-> 좌하단
+            q1.CopyTo(temp);
+            q2.CopyTo(q1);
+            temp.CopyTo(q2);
+
+            temp.Dispose();
+            q0.Dispose();
+            q1.Dispose();
+            q2.Dispose();
+            q3.Dispose();
+        }
+
+        private void 퓨리에변환클로드ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+
+                //--- 여기에
+                // 0. 입력 경로 결정 (인자가 없으면 기본 파일명 사용)
+                //string path = args.Length > 0 ? args[0] : "input.jpg";
+
+                // 1. 그레이스케일로 이미지 로드
+                //Mat src = Cv2.ImRead(path, ImreadModes.Grayscale);
+                //if (src.Empty())
+                //{
+                //    Console.WriteLine($"이미지를 불러올 수 없습니다: {path}");
+                //    return;
+                //}
+
+                Mat loaded = inputImage;
+                // 1. 이미지 로드
+                //Mat loaded = Cv2.ImRead(path, ImreadModes.AnyColor);
+                //if (loaded.Empty())
+                //{
+                //    Console.WriteLine($"이미지를 불러올 수 없습니다: {path}");
+                //    return;
+                //}
+                // 1-1. ★ 반드시 단일 채널(그레이스케일)로 강제
+                //      ImRead 옵션과 무관하게, 채널이 1이 아니면 직접 변환한다.
+                //      (DFT는 3채널/4채널 영상을 받지 못함)
+                Mat src = new Mat();
+                if (loaded.Channels() == 1)
+                    loaded.CopyTo(src);
+                else
+                    Cv2.CvtColor(loaded, src, ColorConversionCodes.BGR2GRAY);
+
+                Console.WriteLine($"로드 영상 타입: {loaded.Type()} / 채널: {loaded.Channels()}");
+                Console.WriteLine($"그레이 변환 후: {src.Type()} / 채널: {src.Channels()}");
+
+                // 2. DFT 연산 속도를 위해 최적 크기로 0-패딩
+                //    (2,3,5의 곱으로 분해되는 크기일 때 FFT가 가장 빠름)
+                int optRows = Cv2.GetOptimalDFTSize(src.Rows);
+                int optCols = Cv2.GetOptimalDFTSize(src.Cols);
+
+                Mat padded = new Mat();
+                Cv2.CopyMakeBorder(
+                    src, padded,
+                    top: 0, bottom: optRows - src.Rows,
+                    left: 0, right: optCols - src.Cols,
+                    BorderTypes.Constant, Scalar.All(0));
+
+                // 3. 입력 영상을 32비트 float(CV_32FC1)로 변환
+                //    ★ DFT 입력은 반드시 1채널 또는 2채널 float여야 한다.
+                //      (CV_32FC1 / CV_32FC2 / CV_64FC1 / CV_64FC2)
+                //      CV_8U 정수 영상이나 잘못된 채널수가 들어가면 다음 예외 발생:
+                //      "type == CV_32FC1 || CV_32FC2 || CV_64FC1 || CV_64FC2"
+                Mat floatImg = new Mat();
+                padded.ConvertTo(floatImg, MatType.CV_32F);
+
+                // (디버그) DFT 입력 타입 확인 — 정상이면 CV_32FC1 이어야 함
+                Console.WriteLine($"DFT 입력 타입: {floatImg.Type()} / 채널: {floatImg.Channels()}");
+
+                // 4. 순방향 DFT 수행
+                //    DftFlags.ComplexOutput → 1채널 실수 입력을 2채널(복소수) 결과로 출력.
+                //    (수동 Merge 없이도 안전하게 복소수 스펙트럼을 얻는 방식)
+                Mat complex = new Mat();
+                Cv2.Dft(floatImg, complex, DftFlags.ComplexOutput);
+
+                // 5. 크기(Magnitude) 계산: sqrt(Re^2 + Im^2)
+                Cv2.Split(complex, out Mat[] split);
+                Mat magnitude = new Mat();
+                Cv2.Magnitude(split[0], split[1], magnitude);
+                foreach (var p in split) p.Dispose();
+
+                // 6. 로그 스케일 변환: log(1 + magnitude)
+                //    (저주파 성분이 너무 커서 그대로는 시각화가 어려움)
+                Cv2.Add(magnitude, Scalar.All(1), magnitude);
+                Cv2.Log(magnitude, magnitude);
+
+                // 7. 홀수 행/열 제거 후 사분면 재배치(fftshift)
+                //    → 저주파(DC) 성분을 영상 중앙으로 이동
+                Mat spectrum = new Mat(
+                    magnitude,
+                    new Rect(0, 0, magnitude.Cols & -2, magnitude.Rows & -2));
+                FftShift(spectrum);
+
+                // 8. 0~1 범위로 정규화하여 디스플레이 가능하게 만듦
+                Cv2.Normalize(spectrum, spectrum, 0, 1, NormTypes.MinMax);
+
+                // 9. 결과 표시
+                Cv2.ImShow("Input Image", src);
+                Cv2.ImShow("Magnitude Spectrum", spectrum);
+                Cv2.WaitKey(0);
+                Cv2.DestroyAllWindows();
+
+                // 결과 표시
+                //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                //PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        //---------
+        private static void FftShift(Mat mag)
+        {
+            int cx = mag.Cols / 2;
+            int cy = mag.Rows / 2;
+
+            Mat q0 = new Mat(mag, new Rect(0, 0, cx, cy));    // 좌상
+            Mat q1 = new Mat(mag, new Rect(cx, 0, cx, cy));   // 우상
+            Mat q2 = new Mat(mag, new Rect(0, cy, cx, cy));   // 좌하
+            Mat q3 = new Mat(mag, new Rect(cx, cy, cx, cy));  // 우하
+
+            Mat tmp = new Mat();
+
+            // 좌상 <-> 우하
+            q0.CopyTo(tmp);
+            q3.CopyTo(q0);
+            tmp.CopyTo(q3);
+
+            // 우상 <-> 좌하
+            q1.CopyTo(tmp);
+            q2.CopyTo(q1);
+            tmp.CopyTo(q2);
+        }
+
+        private void 블러링챗GPTToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+
+                //--- 여기에
+                // 1. 이미지 경로 설정
+                //string imagePath = @"C:\Images\input.jpg";
+
+                // 2. 이미지 읽기
+                //Mat src = Cv2.ImRead(imagePath, ImreadModes.Color);
+                Mat src = inputImage;
+
+                if (src.Empty())
+                {
+                    Console.WriteLine("이미지를 불러올 수 없습니다.");
+                    return;
+                }
+
+                // 3. 가우시안 블러링 적용
+                Mat blurred = new Mat();
+
+                // kernel size는 홀수여야 함: 3, 5, 7, 9, 15 ...
+                // sigmaX, sigmaY가 클수록 더 많이 흐려짐
+                Cv2.GaussianBlur(
+                    src,
+                    blurred,
+                    new OpenCvSharp.Size(15, 15),
+                    3.0,
+                    3.0,
+                    BorderTypes.Default
+                );
+
+                // 4. 결과 출력
+                Cv2.ImShow("Original Image", src);
+                Cv2.ImShow("Gaussian Blur - Spatial Domain", blurred);
+
+                // 4. 결과 표시
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(blurred);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
+                Cv2.WaitKey(0);
+                Cv2.DestroyAllWindows();
+
+                // 5. 메모리 해제
+                //src.Dispose();
+                //blurred.Dispose();
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        private void 변환블러링챗GPTToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+
+                //--- 여기에
+
+                // 1. 이미지 경로 설정
+                //string imagePath = @"C:\Images\input.jpg";
+
+                // 2. 이미지 읽기
+                //Mat src = Cv2.ImRead(imagePath, ImreadModes.Color);
+                Mat src = inputImage;
+
+                if (src.Empty())
+                {
+                    Console.WriteLine("이미지를 불러올 수 없습니다.");
+                    return;
+                }
+
+                // 3. B, G, R 채널 분리
+                Cv2.Split(src, out Mat[] srcChannels);
+
+                Mat[] blurredChannels = new Mat[srcChannels.Length];
+
+                // 공간 도메인의 sigma와 비슷한 의미로 사용
+                // 값이 클수록 더 강한 블러 효과가 나타남
+                double sigmaSpatial = 3.0;
+
+                // 4. 각 채널에 대해 주파수 도메인 가우시안 블러링 수행
+                for (int i = 0; i < srcChannels.Length; i++)
+                {
+                    blurredChannels[i] = ApplyGaussianBlurFrequencyDomain(srcChannels[i], sigmaSpatial);
+                }
+
+                // 5. 처리된 채널 병합
+                Mat frequencyBlurred = new Mat();
+                Cv2.Merge(blurredChannels, frequencyBlurred);
+
+                // 6. 결과 출력
+                Cv2.ImShow("Original Image", src);
+                Cv2.ImShow("Gaussian Blur - Frequency Domain", frequencyBlurred);
+
+                // 4. 결과 표시
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frequencyBlurred);
+                //PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
+                Cv2.WaitKey(0);
+                Cv2.DestroyAllWindows();
+
+                // 7. 메모리 해제
+                //src.Dispose();
+                //frequencyBlurred.Dispose();
+                //foreach (Mat ch in srcChannels) ch.Dispose();
+                //foreach (Mat ch in blurredChannels) ch.Dispose();
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        //-----------------------------
+
+        /// <summary>
+        /// 단일 채널 이미지에 대해 주파수 도메인 Gaussian Low-Pass Filter 적용
+        /// </summary>
+        static Mat ApplyGaussianBlurFrequencyDomain(Mat inputChannel, double sigmaSpatial)
+        {
+            // 1. DFT 연산에 적합한 크기로 패딩
+            int optimalRows = Cv2.GetOptimalDFTSize(inputChannel.Rows);
+            int optimalCols = Cv2.GetOptimalDFTSize(inputChannel.Cols);
+
+            Mat padded = new Mat();
+            Cv2.CopyMakeBorder(
+                inputChannel,
+                padded,
+                0,
+                optimalRows - inputChannel.Rows,
+                0,
+                optimalCols - inputChannel.Cols,
+                BorderTypes.Constant,
+                Scalar.All(0)
+            );
+
+            // 2. DFT 입력은 float 형식이어야 함
+            Mat floatImage = new Mat();
+            padded.ConvertTo(floatImage, MatType.CV_32FC1);
+
+            // 3. 복소수 영상 생성: 실수부 = 입력 영상, 허수부 = 0
+            Mat imaginary = new Mat(padded.Size(), MatType.CV_32FC1, Scalar.All(0));
+
+            Mat complexImage = new Mat();
+            Cv2.Merge(new Mat[] { floatImage, imaginary }, complexImage);
+
+            // 4. DFT 수행
+            Cv2.Dft(complexImage, complexImage);
+
+            // 5. Gaussian Low-Pass Filter 생성
+            Mat gaussianFilter = CreateGaussianLowPassFilter(
+                padded.Rows,
+                padded.Cols,
+                sigmaSpatial
+            );
+
+            // 6. 필터도 복소수 형태로 생성
+            // 실수부와 허수부 모두 같은 필터를 넣으면
+            // 복소수 스펙트럼의 실수부/허수부에 동일한 감쇠가 적용됨
+            Mat filterComplex = new Mat();
+            Cv2.Merge(new Mat[] { gaussianFilter, gaussianFilter }, filterComplex);
+
+            // 7. 주파수 영역에서 스펙트럼 곱셈
+            Mat filteredComplex = new Mat();
+            Cv2.MulSpectrums(
+                complexImage,
+                filterComplex,
+                filteredComplex,
+                DftFlags.None,
+                false
+            );
+
+            // 8. 역 DFT 수행
+            Mat inverse = new Mat();
+            Cv2.Dft(
+                filteredComplex,
+                inverse,
+                DftFlags.Inverse | DftFlags.Scale | DftFlags.RealOutput
+            );
+
+            // 9. 원래 이미지 크기로 자르기
+            Mat cropped = new Mat(
+                inverse,
+                new Rect(0, 0, inputChannel.Cols, inputChannel.Rows)
+            );
+
+            // 10. 화면 표시용 8비트 영상으로 변환
+            Mat result = new Mat();
+            cropped.ConvertTo(result, MatType.CV_8UC1);
+
+            // 11. 메모리 해제
+            padded.Dispose();
+            floatImage.Dispose();
+            imaginary.Dispose();
+            complexImage.Dispose();
+            gaussianFilter.Dispose();
+            filterComplex.Dispose();
+            filteredComplex.Dispose();
+            inverse.Dispose();
+            cropped.Dispose();
+
+            return result;
+        }
+
+        /// <summary>
+        /// 주파수 도메인용 Gaussian Low-Pass Filter 생성
+        /// </summary>
+        static Mat CreateGaussianLowPassFilter(int rows, int cols, double sigmaSpatial)
+        {
+            Mat filter = new Mat(rows, cols, MatType.CV_32FC1);
+
+            double sigma2 = sigmaSpatial * sigmaSpatial;
+
+            for (int y = 0; y < rows; y++)
+            {
+                // DFT 결과에서 DC 성분은 좌상단에 있으므로
+                // 주파수 좌표를 원형 주기 구조로 계산
+                int v = Math.Min(y, rows - y);
+
+                for (int x = 0; x < cols; x++)
+                {
+                    int u = Math.Min(x, cols - x);
+
+                    // 정규화된 주파수 좌표
+                    double fx = (double)u / cols;
+                    double fy = (double)v / rows;
+
+                    // Gaussian Low-Pass Filter
+                    // H(u,v) = exp(-2 * pi^2 * sigma^2 * (fx^2 + fy^2))
+                    double value = Math.Exp(
+                        -2.0 * Math.PI * Math.PI * sigma2 * (fx * fx + fy * fy)
+                    );
+
+                    filter.Set<float>(y, x, (float)value);
+                }
+            }
+
+            return filter;
+        }
+
+        private void 가우시안블러링효과ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (inputImage != null)
+            {
+                outputImage = new Mat();
+                int kernelSize = 15;  // GaussianBlur(Size(31,31))와 동일한 정도
+
+                //--- 여기에
+                // 공간 도메인에서의 가우시안 블러링을 적용
+                // 3. 가우시안 블러링 적용
+                Mat blurred = new Mat();
+
+                // kernel size는 홀수여야 함: 3, 5, 7, 9, 15 ...
+                // sigmaX, sigmaY가 클수록 더 많이 흐려짐
+                double sigma = (kernelSize - 1) / 6.0;
+                Cv2.GaussianBlur(inputImage, blurred,
+                    new OpenCvSharp.Size(kernelSize, kernelSize), sigma, sigma, BorderTypes.Default
+                );
+
+                // 주파수 도메인에서 가우시안 블러링을 적용
+                outputImage = FourierGaussianBlur.GaussianBlurFFT(inputImage, kernelSize);
+
+                // 4. 결과 출력
+                Cv2.ImShow("Original Image", inputImage);
+                Cv2.ImShow("Gaussian Blur - Spatial Domain", blurred);
+                Cv2.ImShow("Gaussian Blur - Frequency Domain", outputImage);
+
+                // 4. 결과 표시
+                PB_OutputImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(outputImage);
+                PB_OutputImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
+                Cv2.WaitKey(0);
+                Cv2.DestroyAllWindows();
+
+            }
+            else
+            {
+                MessageBox.Show("Input Image is NOT ready ...");
+            }
+        }
+
+        //-----------------------------------
         // ------
         private void GetImageHistogram(Mat inputImage)
         {

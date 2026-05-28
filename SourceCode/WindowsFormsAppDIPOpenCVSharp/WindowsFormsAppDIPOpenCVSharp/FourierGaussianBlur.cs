@@ -136,9 +136,9 @@ namespace WindowsFormsAppDIPOpenCVSharp
 
             Mat[] planes =
             {
-        f32,
-        new Mat(gray.Rows, gray.Cols, MatType.CV_32F, Scalar.All(0))
-    };
+                f32,
+                new Mat(gray.Rows, gray.Cols, MatType.CV_32F, Scalar.All(0))
+            };
             Mat complexSrc = new Mat();
             Cv2.Merge(planes, complexSrc);
             Cv2.Dft(complexSrc, complexSrc);
@@ -160,9 +160,9 @@ namespace WindowsFormsAppDIPOpenCVSharp
             // 4) FFT(kernel)
             Mat[] kPlanes =
             {
-        kernelPadded,
-        new Mat(gray.Rows, gray.Cols, MatType.CV_32F, Scalar.All(0))
-    };
+                kernelPadded,
+                new Mat(gray.Rows, gray.Cols, MatType.CV_32F, Scalar.All(0))
+            };
             Mat complexKernel = new Mat();
             Cv2.Merge(kPlanes, complexKernel);
             Cv2.Dft(complexKernel, complexKernel);
